@@ -8,7 +8,7 @@
     "url": "git+https://github.com/janrsilva/encurtador-de-links-nodejs.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev.docker": "nodemon -L app/server.js #@janrilva https://github.com/remy/nodemon#application-isnt-restarting"
   },
   "keywords": [
     "encurtador",
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/janrsilva/encurtador-de-links-nodejs/issues"
   },
-  "homepage": "https://github.com/janrsilva/encurtador-de-links-nodejs#readme"
+  "homepage": "https://github.com/janrsilva/encurtador-de-links-nodejs#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
