@@ -33,4 +33,11 @@ export class FirebaseDBAdapter implements IDB, IDBConnection {
             reject();
         });
     }
+
+    getByShortName<T>(shortName: string, collection: string): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            resolve();
+            reject();
+        });
+    }
 }

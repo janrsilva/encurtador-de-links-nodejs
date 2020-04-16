@@ -78,6 +78,15 @@ export class MongoDBAdapter implements IDB, IDBConnection {
         });
     }
 
+    getByShortName<T>(shortName: string, collection: string): Promise<T> {
+        return new Promise<T>(async (resolve, reject) => {
+            const result = await this.db.collection(collection).find(
+                this.queryBy('short_name', shortName)
+            ).limit(1).toArray();
+            resolve(result[0]);
+        });
+    }
+
     isSuccess(error: any, result: any) {
         return !error && result;
     }
@@ -88,5 +97,9 @@ export class MongoDBAdapter implements IDB, IDBConnection {
 
     queryOne(uuid: string): mongodb.FilterQuery<any> {
         return {_id: new mongodb.ObjectId(uuid)} as mongodb.FilterQuery<any>;
+    }
+
+    queryBy(key: string, value: any): mongodb.FilterQuery<any> {
+        return {[key]: value} as mongodb.FilterQuery<any>;
     }
 }

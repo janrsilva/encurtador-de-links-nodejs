@@ -1,3 +1,4 @@
+import { ILink } from './../interfaces/link-interface';
 import { IDB } from './../interfaces/db-interface';
 export class LinkService {
     db: IDB;
@@ -7,16 +8,20 @@ export class LinkService {
         this.db = db;
     }
 
-    create(link: any): Promise<any> {
-        return this.db.create(link, this.collecttion);
+    create(link: ILink): Promise<ILink> {
+        return this.db.create<ILink>(link, this.collecttion);
     }
 
-    update(uuid: string, link: any): Promise<any> {
-        return this.db.update(uuid, link, this.collecttion);
+    update(uuid: string, link: ILink): Promise<ILink> {
+        return this.db.update<ILink>(uuid, link, this.collecttion);
     }
 
-    get(uuid: string): Promise<any>  {
-        return this.db.get(uuid, this.collecttion);
+    get(uuid: string): Promise<ILink>  {
+        return this.db.get<ILink>(uuid, this.collecttion);
+    }
+
+    getByShortName(uuid: string): Promise<ILink>  {
+        return this.db.getByShortName<ILink>(uuid, this.collecttion);
     }
 
     delete(uuid: string): Promise<boolean>  {

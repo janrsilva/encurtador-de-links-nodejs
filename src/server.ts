@@ -1,3 +1,4 @@
+import { LinkController } from './controllers/link-controller';
 import { LinkRouter } from './routes/link-routes';
 import { MongoDBAdapter } from './adapters/mongo-db-adapter';
 import { DBFactory } from './factories/db-factory';
@@ -37,8 +38,10 @@ export class Server {
     this.app.get('/ping', (req, res) => {
       res.send('pong');
     });
-
     this.app.use('/links', LinkRouter.router());
+    this.app.get('/:short_name', (req, res) => {
+      LinkController.getInstance().redirect(req, res);
+    });
   }
 
   start() {

@@ -37,4 +37,13 @@ export class LinkController {
             res.status(404).send(null);
         }
     }
+
+    async redirect(req: Request, res: Response) {
+        const link = await this.linkService.getByShortName(req.params.short_name);
+        if (link) {
+            res.redirect(301, link.full_link);
+        } else {
+            res.redirect('/');
+        }
+    }
 }
