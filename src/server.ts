@@ -1,8 +1,53 @@
+import { LinkRouter } from './routes/link-routes';
+import { MongoDBAdapter } from './adapters/mongo-db-adapter';
+import { DBFactory } from './factories/db-factory';
 import express from 'express';
-const app = express();
-app.use(express.json())
+import * as dotenv from 'dotenv';
+import { FirebaseDBAdapter } from './adapters/firebase-db-adapter';
 
-app.listen(80, () => {
-  // tslint:disable-next-line:no-console
-  console.log('Example app listening on port 80!');
-});
+export class Server {
+  app: express.Express;
+  static db: FirebaseDBAdapter | MongoDBAdapter;
+
+  constructor(app: express.Express) {
+    this.app = app;
+  }
+
+  async setup() {
+    this.envConfig();
+    this.expressConfig();
+    await this.dbConfig();
+    this.routes();
+  }
+
+  envConfig() {
+    dotenv.config();
+  }
+
+  expressConfig() {
+    this.app.use(express.json())
+  }
+
+  async dbConfig() {
+    Server.db = DBFactory.build(process.env.DB_DRIVER);
+    await Server.db.connect();
+  }
+
+  routes() {
+    this.app.get('/ping', (req, res) => {
+      res.send('pong');
+    });
+
+    this.app.use('/links', LinkRouter.router());
+  }
+
+  start() {
+    this.app.listen(80, () => {
+      // tslint:disable-next-line:no-console
+      console.log('Example app listening on port 80!');
+    });
+  }
+}
+
+const server = new Server(express());
+server.setup().then(() => server.start());

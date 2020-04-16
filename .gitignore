@@ -1,4 +1,5 @@
 node_modules
 docker/.env
+.env
 .vscode/launch.json
 dist

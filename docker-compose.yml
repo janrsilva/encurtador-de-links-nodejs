@@ -3,13 +3,16 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - ./:/usr/src/app
     environment:
-      - NODE_ENV
-    env_file:
-      - ./docker/.env
+      - NODE_ENV=development
     ports:
       - "${PORT:-80}:80"
     command: npm run dev.docker
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
