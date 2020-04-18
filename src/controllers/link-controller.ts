@@ -38,6 +38,12 @@ export class LinkController {
         }
     }
 
+    async available(req: Request, res: Response) {
+        const link = await this.linkService.getByShortName(req.params.short_name);
+        const available = !link;
+        res.json({available});
+    }
+
     async redirect(req: Request, res: Response) {
         const link = await this.linkService.getByShortName(req.params.short_name);
         if (link) {

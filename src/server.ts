@@ -26,7 +26,7 @@ export class Server {
   }
 
   expressConfig() {
-    this.app.use(express.json())
+    this.app.use(express.json());
   }
 
   async dbConfig() {
@@ -35,6 +35,10 @@ export class Server {
   }
 
   routes() {
+    this.app.get('/', (req, res) => {
+      // res.render('src/views/index');
+      res.sendfile('./src/views/index.html');
+    });
     this.app.get('/ping', (req, res) => {
       res.send('pong');
     });

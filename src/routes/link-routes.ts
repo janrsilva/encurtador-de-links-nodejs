@@ -12,6 +12,9 @@ export class LinkRouter {
         .get('/:uuid', (req, res) => {
             linkController.get(req, res);
         })
+        .get('/:short_name/available', (req, res) => {
+            linkController.available(req, res);
+        })
         .delete('/:uuid', (req, res) => {
             linkController.delete(req, res);
         });

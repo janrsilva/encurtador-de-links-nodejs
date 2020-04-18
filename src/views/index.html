@@ -1,0 +1,185 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-toast-notification/dist/theme-default.css">
+    <style>
+      body {
+        background: #98CE00;
+      }
+
+      #app {
+        display: grid;
+        grid-template-columns: repeat(4, 25%);
+        grid-template-rows: 10vh auto 10vh;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #input-area {
+        background: rgb(56, 68, 24);
+        grid-column: 2/4;
+        grid-row: 2;
+        height: fit-content;
+        text-align: center;
+        border-radius: 20px;
+      }
+
+      [name=short_name] {
+        opacity: .8;
+      }
+
+      #input-area {
+        background: #FFF;
+        padding: 1vw;
+      }
+
+      .available {
+        color: #90ee02 !important;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="input-area">
+        <form novalidate class="md-layout" @submit.prevent="submit">
+          <md-field :class="getValidationClass('full_link')">
+            <md-icon class="md-accent">link</md-icon>
+            <label>Link</label>
+            <md-input name="full_link" id="full_link" v-model="form.full_link" :disabled="sending"></md-input>
+          </md-field>
+          <md-field :class="getValidationClass('short_name')">
+            <label></label>
+            <span class="md-suffix">https://{{ host }}/</span>
+            <md-input v-on:keyup="checkShortNameAvailable()" name="short_name" id="short_name" v-model="form.short_name" :disabled="sending"></md-input>
+            <md-icon v-if="shortNameAvailable !== false" :class="shortNameAvailableClass()">check</md-icon>
+            <md-icon class="md-accent" v-if="shortNameAvailable === false">clear</md-icon>
+          </md-field>
+          <div>
+            <md-button type="submit" class="md-raised md-primary" :disabled="sending">Encurtar</md-button>
+          </div>
+        </form>
+        <div>
+          <md-progress-bar md-mode="determinate" :md-value="progressCompleted"></md-progress-bar>
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.5/dist/vuelidate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.5/dist/validators.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-clipboard@2.2.2/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-toast-notification"></script>
+    <script>
+        Vue.use(VueMaterial.default);
+        Vue.use(VueToast);
+        var Clipboard = window['v-clipboard'];
+        Vue.use(Clipboard.default);
+        new Vue({
+            mixins: [vuelidate.validationMixin],
+            validations: {
+              form: {
+                full_link: {
+                  required: validators.required,
+                },
+                short_name: {
+                  required: validators.required,
+                },
+              }
+            },
+            el: '#app',
+            data: {
+              host: location.host.replace('/', '') || 'example.com',
+              protocol: window.location.protocol || 'http:',
+              form: {
+                full_link: null,
+                short_name: null,
+              },
+              sending: false,
+              shortNameAvailable: null,
+              progressCompleted: 0,
+            },
+            methods: {
+              getValidationClass (fieldName) {
+                const field = this.$v.form[fieldName]
+
+                if (field) {
+                  return {
+                    'md-invalid': field.$invalid && field.$dirty
+                  }
+                }
+              },
+              submit () {
+                if (this.formIsValid()) {
+                  this.checkShortNameAvailable().then(
+                    (available) => {
+                      if (available) {
+                        this.postLink(this.form)
+                      }
+                    }
+                  );
+                }
+              },
+              clearForm () {
+                this.$v.$reset()
+                this.form.short_name = null
+                this.form.full_link = null
+                this.progressCompleted = 0;
+              },
+              copyLink () {
+                this.$clipboard(`${this.protocol}//${this.host}/${this.form.short_name}`);
+              },
+              postLink(link) {
+                let config = {
+                  onUploadProgress: progressEvent => {
+                    this.progressCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
+                  }
+                }
+                axios.post('/links', link, config).then(
+                  (response) => {
+                    this.copyLink();
+                    this.clearForm();
+                    Vue.$toast.success('Seu link foi criado e copiado!', {
+                      duration: 6000,
+                      position: 'bottom',
+                      dismissible: true,
+                    });
+                  }
+                ).catch(
+                  function (error) {
+                    console.log(error);
+                  }
+                ).then(
+                  function () {
+                    // always executed
+                  }
+                );
+              },
+              checkShortNameAvailable() {
+                return axios.get(`/links/${this.form.short_name}/available`).then(
+                  (response) => {
+                    this.shortNameAvailable = response.data.available;
+                    return this.shortNameAvailable;
+                  }
+                );
+              },
+              formIsValid () {
+                this.$v.$touch()
+                return !this.$v.$invalid;
+              },
+              shortNameAvailableClass () {
+                return {
+                  'available': this.shortNameAvailable
+                }
+              }
+            }
+        })
+    </script>
+  </body>
+</html>
