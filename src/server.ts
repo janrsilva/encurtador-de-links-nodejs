@@ -5,6 +5,8 @@ import { DBFactory } from './factories/db-factory';
 import express from 'express';
 import * as dotenv from 'dotenv';
 import { FirebaseDBAdapter } from './adapters/firebase-db-adapter';
+import { Event } from './events/event';
+import { eventMap } from './events/events';
 
 export class Server {
   app: express.Express;
@@ -19,6 +21,11 @@ export class Server {
     this.expressConfig();
     await this.dbConfig();
     this.routes();
+    this.events();
+  }
+
+  events() {
+    Event.subscribe(eventMap);
   }
 
   envConfig() {

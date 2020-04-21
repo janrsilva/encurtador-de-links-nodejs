@@ -1,3 +1,4 @@
+import { LinkClikedEvent } from './../events/link-clicked-event';
 import { ILink } from './../interfaces/link-interface';
 import { Server } from './../server';
 import { LinkService } from './../services/link-service';
@@ -59,7 +60,7 @@ export class LinkController {
         const link = await this.linkService.getByShortName(req.params.short_name);
         if (link) {
             res.redirect(301, link.full_link);
-            this.linkService.countClick(link);
+            LinkClikedEvent.emit(link);
         } else {
             res.redirect('/');
         }

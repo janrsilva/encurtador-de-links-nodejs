@@ -1,7 +1,6 @@
 import { Server } from './../server';
 import { DBFactory } from './../factories/db-factory';
 import { IDBConnection } from './db-connection-interface';
-import { LinkService } from './../services/link-service';
 import express from 'express';
 
 const mockDB = {
