@@ -1,6 +1,7 @@
 export interface ILink {
-    uuid: string;
-    mac_address?: string;
+    _id: string;
+    client_uuid?: string;
     full_link: string;
     short_name: string;
+    clicks: number;
 }

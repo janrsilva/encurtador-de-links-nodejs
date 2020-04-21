@@ -1,6 +1,6 @@
 import { ILink } from './link-interface';
 import { LinkService } from './../services/link-service';
-import { IDB } from './db-interface';
+import { IDB, Params } from './db-interface';
 
 const mockDB = {
   // tslint:disable-next-line: no-shadowed-variable
@@ -10,6 +10,7 @@ const mockDB = {
   delete: jest.fn((uuid: string, collection: string) => new Promise<boolean>((resolve, reject) => resolve())),
   get: jest.fn((uuid: string, collection: string) => new Promise<ILink>((resolve, reject) => resolve())),
   getByShortName: jest.fn((name: string, collection: string) => new Promise<ILink>((resolve, reject) => resolve())),
+  list: jest.fn((params: Params, collection: string, page: number, perPage: number) => new Promise<ILink[]>((resolve, reject) => resolve())),
 } as IDB;
 const service = new LinkService(mockDB);
 const link = {
@@ -33,5 +34,13 @@ describe("call interface methods", () => {
   it("should call the IDB interface delete", () => {
     service.delete('aa-bb-33');
     expect(service.db.update).toHaveBeenCalled();
+  });
+  it("should call the IDB interface list", () => {
+    service.list('aa-bb-33');
+    expect(service.db.list).toHaveBeenCalled();
+  });
+  it("should call the IDB interface getByShortName", () => {
+    service.getByShortName('aa-bb-33');
+    expect(service.db.getByShortName).toHaveBeenCalled();
   });
 });

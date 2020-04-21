@@ -1,3 +1,4 @@
+import { ILink } from './../interfaces/link-interface';
 import { Server } from './../server';
 import { LinkService } from './../services/link-service';
 import { Request, Response } from 'express';
@@ -18,8 +19,9 @@ export class LinkController {
     }
 
     async post(req: Request, res: Response) {
-        const link = await this.linkService.create(req.body);
-        res.status(201).json(link);
+        const link = req.body as ILink;
+        link.client_uuid = req.headers['client-uuid'] as string;
+        res.status(201).json(await this.linkService.create(link));
     }
 
     async delete(req: Request, res: Response) {
@@ -38,6 +40,15 @@ export class LinkController {
         }
     }
 
+    async list(req: Request, res: Response) {
+        const link = await this.linkService.list(req.query.uuid as string);
+        if (link) {
+            res.json(link);
+        } else {
+            res.status(404).send(null);
+        }
+    }
+
     async available(req: Request, res: Response) {
         const link = await this.linkService.getByShortName(req.params.short_name);
         const available = !link;
@@ -48,6 +59,7 @@ export class LinkController {
         const link = await this.linkService.getByShortName(req.params.short_name);
         if (link) {
             res.redirect(301, link.full_link);
+            this.linkService.countClick(link);
         } else {
             res.redirect('/');
         }

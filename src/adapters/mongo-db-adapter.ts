@@ -1,5 +1,5 @@
 import { IDBConnection } from './../interfaces/db-connection-interface';
-import { IDB } from "./../interfaces/db-interface";
+import { IDB, Params } from "./../interfaces/db-interface";
 import * as mongodb from 'mongodb';
 
 export class MongoDBAdapter implements IDB, IDBConnection {
@@ -13,8 +13,6 @@ export class MongoDBAdapter implements IDB, IDBConnection {
         const host = process.env.MONGO_HOST || 'localhost';
         const port = process.env.MONGO_PORT || '27017';
 
-        // tslint:disable-next-line: no-console
-        console.log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ${host} ${port}`);
         this.mongoClient = new mongodb.MongoClient(`mongodb://${host}:${port}`);
         this.mongoClient.connect();
     }
@@ -47,21 +45,25 @@ export class MongoDBAdapter implements IDB, IDBConnection {
         });
     }
 
-    update<T>(uuid: string, obj: T, collection: string): Promise<T> {
+    update<T>(_id: string, obj: T, collection: string): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            this.db.collection(collection).updateOne(this.queryOne(uuid), obj, (error, result: any) => {
-                if (this.isSuccess(error, result)) {
-                    resolve(this.getResultObj(result));
-                } else {
-                    reject(error);
+            this.db.collection(collection).updateOne(
+                this.queryOne(_id),
+                {$set: obj},
+                (error, result: any) => {
+                    if (this.isSuccess(error, result)) {
+                        resolve(result);
+                    } else {
+                        reject(error);
+                    }
                 }
-            });
+            );
         });
     }
 
-    delete(uuid: string, collection: string): Promise<boolean> {
+    delete(_id: string, collection: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            this.db.collection(collection).deleteOne(this.queryOne(uuid), (error: any, result: any) => {
+            this.db.collection(collection).deleteOne(this.queryOne(_id), (error: any, result: any) => {
                 if (result) {
                     resolve(true);
                 } else {
@@ -71,10 +73,22 @@ export class MongoDBAdapter implements IDB, IDBConnection {
         });
     }
 
-    get<T>(uuid: string, collection: string): Promise<T> {
+    get<T>(_id: string, collection: string): Promise<T> {
         return new Promise<T>(async (resolve, reject) => {
-            const result = await this.db.collection(collection).find(this.queryOne(uuid)).limit(1).toArray();
+            const result = await this.db.collection(collection).find(this.queryOne(_id)).limit(1).toArray();
             resolve(result[0]);
+        });
+    }
+
+    list<T>(params: Params, collection: string): Promise<T[]> {
+        // tslint:disable-next-line: no-shadowed-variable
+        let query = {} as mongodb.FilterQuery<any>;
+        Object.keys(params).forEach((key) => {
+            query = {...query, ...this.queryBy(key, params[key])};
+        });
+        return new Promise<T[]>(async (resolve, reject) => {
+            const result = await this.db.collection<T>(collection).find(query).toArray();
+            resolve(result);
         });
     }
 
@@ -95,8 +109,8 @@ export class MongoDBAdapter implements IDB, IDBConnection {
         return result.ops[0];
     }
 
-    queryOne(uuid: string): mongodb.FilterQuery<any> {
-        return {_id: new mongodb.ObjectId(uuid)} as mongodb.FilterQuery<any>;
+    queryOne(_id: string): mongodb.FilterQuery<any> {
+        return {_id: new mongodb.ObjectId(_id)} as mongodb.FilterQuery<any>;
     }
 
     queryBy(key: string, value: any): mongodb.FilterQuery<any> {
