@@ -1,2 +1,2 @@
 import { Event } from "./event";
-export class LinkClikedEvent extends Event { }
+export class LinkClickedEvent extends Event { }

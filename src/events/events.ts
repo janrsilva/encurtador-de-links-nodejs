@@ -1,4 +1,4 @@
-import { LinkClikedEvent } from './link-clicked-event';
+import { LinkClickedEvent } from './link-clicked-event';
 import { IListener } from '../interfaces/listener-interface';
 import { LinkCreatedEvent } from './link-created-event';
 import { WebhookLinkEventListener } from '../listeners/webhook-link-event-listener';
@@ -12,7 +12,7 @@ export const eventMap: EventMap = {
   [LinkCreatedEvent.name]: [
     new WebhookLinkEventListener(),
   ],
-  [LinkClikedEvent.name]: [
+  [LinkClickedEvent.name]: [
     new ClickLinkEventListener(),
     new WebhookLinkEventListener(),
   ]

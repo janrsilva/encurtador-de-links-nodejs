@@ -1,4 +1,6 @@
-import { LinkClikedEvent } from './../events/link-clicked-event';
+import { LinkRepository } from './../repositories/link-repository';
+import { LinkCreatedEvent } from './../events/link-created-event';
+import { LinkClickedEvent } from './../events/link-clicked-event';
 import { ILink } from './../interfaces/link-interface';
 import { Server } from './../server';
 import { LinkService } from './../services/link-service';
@@ -23,6 +25,7 @@ export class LinkController {
         const link = req.body as ILink;
         link.client_uuid = req.headers['client-uuid'] as string;
         res.status(201).json(await this.linkService.create(link));
+        LinkCreatedEvent.emit(link);
     }
 
     async delete(req: Request, res: Response) {
@@ -60,7 +63,7 @@ export class LinkController {
         const link = await this.linkService.getByShortName(req.params.short_name);
         if (link) {
             res.redirect(301, link.full_link);
-            LinkClikedEvent.emit(link);
+            LinkClickedEvent.emit(link);
         } else {
             res.redirect('/');
         }

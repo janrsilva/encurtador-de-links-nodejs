@@ -1,5 +1,5 @@
 import { LinkCreatedEvent } from './link-created-event';
-import { LinkClikedEvent } from './link-clicked-event';
+import { LinkClickedEvent } from './link-clicked-event';
 import { eventMap } from './events';
 import { IListener } from '../interfaces/listener-interface';
 import { Event } from './event';
@@ -8,13 +8,13 @@ const listener = {
     run: jest.fn(),
 } as IListener;
 
-eventMap[LinkClikedEvent.name].push(listener);
-eventMap[LinkCreatedEvent.name].push(listener);
+eventMap[LinkClickedEvent.name] = [listener];
+eventMap[LinkCreatedEvent.name] = [listener];
 Event.subscribe(eventMap);
 
 describe("call some listener", () => {
-    it("event LinkClikedEvent should call the listener run", () => {
-        LinkClikedEvent.emit({});
+    it("event LinkClickedEvent should call the listener run", () => {
+        LinkClickedEvent.emit({});
         expect(listener.run).toHaveBeenCalled();
     });
 

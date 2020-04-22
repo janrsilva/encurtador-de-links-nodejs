@@ -14,10 +14,10 @@ export abstract class Event {
 
     static subscribe(eventMap: EventMap): void {
         this.emitter = new EventEmitter();
-        Object.keys(eventMap).forEach((name: any) => {
+        Object.keys(eventMap).forEach((name: string) => {
             this.emitter.on(name, (value) => {
                 const listeners = eventMap[name];
-                listeners.forEach((listener: IListener) => listener.run(name, value));
+                listeners.forEach((listener: IListener) => listener.run(value, name));
             });
         });
     }
