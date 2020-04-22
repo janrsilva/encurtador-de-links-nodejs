@@ -16,7 +16,7 @@ export class LinkController {
     }
 
     private constructor() {
-        this.linkService = new LinkService(Server.db);
+        this.linkService = new LinkService(new LinkRepository(Server.db));
     }
 
     async post(req: Request, res: Response) {

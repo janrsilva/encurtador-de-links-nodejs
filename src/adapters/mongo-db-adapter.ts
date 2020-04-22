@@ -1,8 +1,8 @@
 import { IDBConnection } from './../interfaces/db-connection-interface';
-import { IDB, Params } from "./../interfaces/db-interface";
+import { IDBRepository, Params } from "./../interfaces/db-interface";
 import * as mongodb from 'mongodb';
 
-export class MongoDBAdapter implements IDB, IDBConnection {
+export class MongoDBAdapter implements IDBRepository, IDBConnection {
     mongoClient: mongodb.MongoClient;
 
     get db(): mongodb.Db {
@@ -92,7 +92,7 @@ export class MongoDBAdapter implements IDB, IDBConnection {
         });
     }
 
-    getByShortName<T>(shortName: string, collection: string): Promise<T> {
+    getByKey<T>(shortName: string, collection: string): Promise<T> {
         return new Promise<T>(async (resolve, reject) => {
             const result = await this.db.collection(collection).find(
                 this.queryBy('short_name', shortName)

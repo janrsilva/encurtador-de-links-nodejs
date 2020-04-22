@@ -1,40 +1,40 @@
 import { ILink } from './../interfaces/link-interface';
-import { IDB } from './../interfaces/db-interface';
+import { ILinkDBRepository } from './../interfaces/db-interface';
 export class LinkService {
-    db: IDB;
+    repository: ILinkDBRepository;
     collecttion = 'links';
 
-    constructor (db: IDB) {
-        this.db = db;
+    constructor (repository: ILinkDBRepository) {
+        this.repository = repository;
     }
 
     create(link: ILink): Promise<ILink> {
-        return this.db.create<ILink>(link, this.collecttion);
+        return this.repository.create(link);
     }
 
     update(_id: string, link: ILink): Promise<ILink> {
-        return this.db.update<ILink>(_id, link, this.collecttion);
+        return this.repository.update(_id, link);
     }
 
     countClick(link: ILink): Promise<ILink> {
-        link.clicks = link.clicks || 0;
-        link.clicks++;
-        return this.db.update<ILink>(link._id, link, this.collecttion);
+        let clicks = link.clicks || 0;
+        clicks++;
+        return this.repository.update(link._id, {...link, ...{clicks}});
     }
 
     get(_id: string): Promise<ILink>  {
-        return this.db.get<ILink>(_id, this.collecttion);
+        return this.repository.get(_id);
     }
 
     list(clientUuid: string): Promise<ILink[]>  {
-        return this.db.list<ILink>({client_uuid: clientUuid}, this.collecttion);
+        return this.repository.list({client_uuid: clientUuid});
     }
 
-    getByShortName(_id: string): Promise<ILink>  {
-        return this.db.getByShortName<ILink>(_id, this.collecttion);
+    getByShortName(shortName: string): Promise<ILink>  {
+        return this.repository.getByKey('short_name', shortName);
     }
 
     delete(_id: string): Promise<boolean>  {
-        return this.db.delete(_id, this.collecttion);
+        return this.repository.delete(_id);
     }
 }

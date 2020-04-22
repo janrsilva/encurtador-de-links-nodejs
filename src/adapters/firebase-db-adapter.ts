@@ -1,7 +1,7 @@
 import { IDBConnection } from './../interfaces/db-connection-interface';
-import { IDB } from './../interfaces/db-interface';
+import { IDBRepository } from './../interfaces/db-interface';
 
-export class FirebaseDBAdapter implements IDB, IDBConnection {
+export class FirebaseDBAdapter implements IDBRepository, IDBConnection {
 
     // tslint:disable-next-line: no-empty
     connect() { }
@@ -41,7 +41,7 @@ export class FirebaseDBAdapter implements IDB, IDBConnection {
         });
     }
 
-    getByShortName<T>(shortName: string, collection: string): Promise<T> {
+    getByKey<T>(shortName: string, collection: string): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             resolve();
             reject();
