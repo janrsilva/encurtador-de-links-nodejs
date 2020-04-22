@@ -92,10 +92,10 @@ export class MongoDBAdapter implements IDBRepository, IDBConnection {
         });
     }
 
-    getByKey<T>(shortName: string, collection: string): Promise<T> {
+    getByKey<T>(key: string, value: string, collection: string): Promise<T> {
         return new Promise<T>(async (resolve, reject) => {
             const result = await this.db.collection(collection).find(
-                this.queryBy('short_name', shortName)
+                this.queryBy(key, value)
             ).limit(1).toArray();
             resolve(result[0]);
         });

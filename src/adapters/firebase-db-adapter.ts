@@ -41,7 +41,7 @@ export class FirebaseDBAdapter implements IDBRepository, IDBConnection {
         });
     }
 
-    getByKey<T>(shortName: string, collection: string): Promise<T> {
+    getByKey<T>(key: string, value: string, collection: string): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             resolve();
             reject();
