@@ -6,7 +6,6 @@ FROM node:10
 WORKDIR /usr/src/app
 
 RUN npm i -g nodemon
-RUN npm i -g @angular/cli
 RUN npm i
 
 CMD [ "node", "dist/server.js" ]
