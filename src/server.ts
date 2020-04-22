@@ -1,3 +1,5 @@
+import { IJobProcess } from './interfaces/job-process-interface';
+import { QueueFactory } from './factories/queue-factory';
 import { LinkController } from './controllers/link-controller';
 import { LinkRouter } from './routes/link-routes';
 import { MongoDBAdapter } from './adapters/mongo-db-adapter';
@@ -11,6 +13,7 @@ import { eventMap } from './events/events';
 export class Server {
   app: express.Express;
   static db: FirebaseDBAdapter | MongoDBAdapter;
+  static queue: IJobProcess;
 
   constructor(app: express.Express) {
     this.app = app;
@@ -39,6 +42,11 @@ export class Server {
   async dbConfig() {
     Server.db = DBFactory.build(process.env.DB_DRIVER);
     await Server.db.connect();
+  }
+
+  queueConfig() {
+    Server.queue = QueueFactory.build(process.env.QUEUE_DRIVER);
+    Server.queue.listen();
   }
 
   routes() {
