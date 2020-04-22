@@ -1,3 +1,4 @@
+import { IWebhook } from './webhook-interface';
 import { ILink } from './link-interface';
 export interface IDBRepository {
     create<T>(obj: T, collection: string): Promise<T>;
@@ -15,6 +16,13 @@ export interface ILinkDBRepository {
     list(params: Params, page?: number, perPage?: number): Promise<ILink[]>;
     get(_id: string): Promise<ILink>;
     getByKey(key: string, value: string): Promise<ILink>;
+}
+
+export interface IWebhookRepository {
+    create(obj: IWebhook): Promise<IWebhook>;
+    delete(_id: string): Promise<boolean>;
+    list(params: Params, page?: number, perPage?: number): Promise<IWebhook[]>;
+    get(_id: string): Promise<IWebhook>;
 }
 
 export interface Params { [key: string]: any; }

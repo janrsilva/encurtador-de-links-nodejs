@@ -1,3 +1,4 @@
+import { WebhookRouter } from './routes/webhook-routes';
 import { IJobProcess } from './interfaces/job-process-interface';
 import { QueueFactory } from './factories/queue-factory';
 import { LinkController } from './controllers/link-controller';
@@ -57,6 +58,7 @@ export class Server {
     this.app.get('/ping', (req, res) => {
       res.send('pong');
     });
+    this.app.use('/webhooks', WebhookRouter.router());
     this.app.use('/links', LinkRouter.router());
     this.app.get('/:short_name', (req, res) => {
       LinkController.getInstance().redirect(req, res);
